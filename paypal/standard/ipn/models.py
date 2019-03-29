@@ -28,11 +28,11 @@ class PayPalIPN(PayPalStandardBase):
         while attempts_number > 0:
             data = b"cmd=_notify-validate&" + self.query.encode("ascii")
             content = requests.post(self.get_endpoint(), data=data).content
-            if content not in [b"INVALID", b"VERIFIED"]:
+            if content in [b"VERIFIED", b"INVALID"]:
+                attempts_number = 0
+            else:
                 attempts_number -= 1
                 sleep(wait_seconds)
-            else:
-                attempts_number = 0
         return content
 
     def _verify_postback(self):
